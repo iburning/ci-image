@@ -1,1 +1,129 @@
-define("CafeinitVue",[],function(){return function(n){function t(r){if(e[r])return e[r].exports;var o=e[r]={exports:{},id:r,loaded:!1};return n[r].call(o.exports,o,o.exports,t),o.loaded=!0,o.exports}var e={};return t.m=n,t.c=e,t.p="",t(0)}([function(n,t,e){"use strict";function r(n){return n&&n.__esModule?n:{"default":n}}var o=e(19),u=r(o),i=e(20),f=r(i),c=function(){function n(t,e){(0,u["default"])(this,n),this.ver="0.0.0",this.image=null,"string"==typeof t&&this.initWithUrl(t,e)}return(0,f["default"])(n,[{key:"initWithUrl",value:function(n,t){var e=this,r=new Image;r.onload=function(n){console.log("CIImage.onload",n,r),e.image=r,t.call(this,e)},r.src=n}}]),n}();n.exports=c},function(n,t,e){n.exports=!e(4)(function(){return 7!=Object.defineProperty({},"a",{get:function(){return 7}}).a})},function(n,t){n.exports=function(n){return"object"==typeof n?null!==n:"function"==typeof n}},function(n,t){var e=n.exports={version:"2.4.0"};"number"==typeof __e&&(__e=e)},function(n,t){n.exports=function(n){try{return!!n()}catch(t){return!0}}},function(n,t){var e=n.exports="undefined"!=typeof window&&window.Math==Math?window:"undefined"!=typeof self&&self.Math==Math?self:Function("return this")();"number"==typeof __g&&(__g=e)},function(n,t,e){var r=e(9),o=e(14),u=e(16),i=Object.defineProperty;t.f=e(1)?Object.defineProperty:function(n,t,e){if(r(n),t=u(t,!0),r(e),o)try{return i(n,t,e)}catch(f){}if("get"in e||"set"in e)throw TypeError("Accessors not supported!");return"value"in e&&(n[t]=e.value),n}},function(n,t,e){e(17);var r=e(3).Object;n.exports=function(n,t,e){return r.defineProperty(n,t,e)}},function(n,t){n.exports=function(n){if("function"!=typeof n)throw TypeError(n+" is not a function!");return n}},function(n,t,e){var r=e(2);n.exports=function(n){if(!r(n))throw TypeError(n+" is not an object!");return n}},function(n,t,e){var r=e(8);n.exports=function(n,t,e){if(r(n),void 0===t)return n;switch(e){case 1:return function(e){return n.call(t,e)};case 2:return function(e,r){return n.call(t,e,r)};case 3:return function(e,r,o){return n.call(t,e,r,o)}}return function(){return n.apply(t,arguments)}}},function(n,t,e){var r=e(2),o=e(5).document,u=r(o)&&r(o.createElement);n.exports=function(n){return u?o.createElement(n):{}}},function(n,t,e){var r=e(5),o=e(3),u=e(10),i=e(13),f="prototype",c=function(n,t,e){var a,l,s,p=n&c.F,d=n&c.G,v=n&c.S,y=n&c.P,h=n&c.B,x=n&c.W,w=d?o:o[t]||(o[t]={}),b=w[f],_=d?r:v?r[t]:(r[t]||{})[f];d&&(e=t);for(a in e)l=!p&&_&&void 0!==_[a],l&&a in w||(s=l?_[a]:e[a],w[a]=d&&"function"!=typeof _[a]?e[a]:h&&l?u(s,r):x&&_[a]==s?function(n){var t=function(t,e,r){if(this instanceof n){switch(arguments.length){case 0:return new n;case 1:return new n(t);case 2:return new n(t,e)}return new n(t,e,r)}return n.apply(this,arguments)};return t[f]=n[f],t}(s):y&&"function"==typeof s?u(Function.call,s):s,y&&((w.virtual||(w.virtual={}))[a]=s,n&c.R&&b&&!b[a]&&i(b,a,s)))};c.F=1,c.G=2,c.S=4,c.P=8,c.B=16,c.W=32,c.U=64,c.R=128,n.exports=c},function(n,t,e){var r=e(6),o=e(15);n.exports=e(1)?function(n,t,e){return r.f(n,t,o(1,e))}:function(n,t,e){return n[t]=e,n}},function(n,t,e){n.exports=!e(1)&&!e(4)(function(){return 7!=Object.defineProperty(e(11)("div"),"a",{get:function(){return 7}}).a})},function(n,t){n.exports=function(n,t){return{enumerable:!(1&n),configurable:!(2&n),writable:!(4&n),value:t}}},function(n,t,e){var r=e(2);n.exports=function(n,t){if(!r(n))return n;var e,o;if(t&&"function"==typeof(e=n.toString)&&!r(o=e.call(n)))return o;if("function"==typeof(e=n.valueOf)&&!r(o=e.call(n)))return o;if(!t&&"function"==typeof(e=n.toString)&&!r(o=e.call(n)))return o;throw TypeError("Can't convert object to primitive value")}},function(n,t,e){var r=e(12);r(r.S+r.F*!e(1),"Object",{defineProperty:e(6).f})},function(n,t,e){n.exports={"default":e(7),__esModule:!0}},function(n,t){"use strict";t.__esModule=!0,t["default"]=function(n,t){if(!(n instanceof t))throw new TypeError("Cannot call a class as a function")}},function(n,t,e){"use strict";function r(n){return n&&n.__esModule?n:{"default":n}}t.__esModule=!0;var o=e(18),u=r(o);t["default"]=function(){function n(n,t){for(var e=0;e<t.length;e++){var r=t[e];r.enumerable=r.enumerable||!1,r.configurable=!0,"value"in r&&(r.writable=!0),(0,u["default"])(n,r.key,r)}}return function(t,e,r){return e&&n(t.prototype,e),r&&n(t,r),t}}()}])});
+define("CafeinitVue", [], function() { return /******/ (function(modules) { // webpackBootstrap
+/******/ 	// The module cache
+/******/ 	var installedModules = {};
+
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+
+/******/ 		// Check if module is in cache
+/******/ 		if(installedModules[moduleId])
+/******/ 			return installedModules[moduleId].exports;
+
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = installedModules[moduleId] = {
+/******/ 			exports: {},
+/******/ 			id: moduleId,
+/******/ 			loaded: false
+/******/ 		};
+
+/******/ 		// Execute the module function
+/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+
+/******/ 		// Flag the module as loaded
+/******/ 		module.loaded = true;
+
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+
+
+/******/ 	// expose the modules object (__webpack_modules__)
+/******/ 	__webpack_require__.m = modules;
+
+/******/ 	// expose the module cache
+/******/ 	__webpack_require__.c = installedModules;
+
+/******/ 	// __webpack_public_path__
+/******/ 	__webpack_require__.p = "";
+
+/******/ 	// Load entry module and return exports
+/******/ 	return __webpack_require__(0);
+/******/ })
+/************************************************************************/
+/******/ ([
+/* 0 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	/**
+	 * @fileoverview CIImage
+	 * @author: burning <www.cafeinit.com>
+	 * @version: 2016-12-01
+	 */
+
+	// import EXIF from 'exif-js'
+
+	exports.default = {
+	  var: '0.0.0',
+
+	  loadImage: function loadImage(src, callback) {
+	    var img = new Image();
+	    img.onload = function () {
+	      callback && callback.call(this, img);
+	    };
+	    img.src = src;
+	  },
+	  getData: function getData(img, callback) {
+	    EXIF.getData(img, callback);
+	  },
+	  _getData: function _getData(img, callback) {
+	    function handleBinaryFile(binFile) {
+	      var data = findEXIFinJPEG(binFile);
+	      var iptcdata = findIPTCinJPEG(binFile);
+	      img.exifdata = data || {};
+	      img.iptcdata = iptcdata || {};
+
+	      callback && callback.call(img);
+	    }
+
+	    if (img.src) {
+	      if (/^data\:/i.test(img.src)) {
+	        // Data URI
+	        console.log('CIImage._getData URI');
+	        // var arrayBuffer = base64ToArrayBuffer(img.src);
+	        // handleBinaryFile(arrayBuffer);
+	      } else if (/^blob\:/i.test(img.src)) {
+	        // Object URL
+	        console.log('CIImage._getData URL');
+	        // var fileReader = new FileReader();
+	        // fileReader.onload = function(e) {
+	        //   handleBinaryFile(e.target.result);
+	        // };
+	        // objectURLToBlob(img.src, function (blob) {
+	        //   fileReader.readAsArrayBuffer(blob);
+	        // });
+	      } else {
+	        (function () {
+	          console.log('CIImage._getData Request');
+	          var http = new XMLHttpRequest();
+	          http.onload = function () {
+	            if (this.status == 200 || this.status === 0) {
+	              handleBinaryFile(http.response);
+	            } else {
+	              throw 'Could not load image';
+	            }
+	            http = null;
+	          };
+	          http.open('GET', img.src, true);
+	          http.responseType = 'arraybuffer';
+	          http.send(null);
+	        })();
+	      }
+	    } else if (window.FileReader && (img instanceof window.Blob || img instanceof window.File)) {
+	      var fileReader = new FileReader();
+	      fileReader.onload = function (e) {
+	        if (debug) console.log("Got file of length " + e.target.result.byteLength);
+	        handleBinaryFile(e.target.result);
+	      };
+
+	      fileReader.readAsArrayBuffer(img);
+	    }
+	  }
+	};
+
+/***/ }
+/******/ ])});;

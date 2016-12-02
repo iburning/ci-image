@@ -1,0 +1,29 @@
+{
+  "name": "ci-image-demo",
+  "homepage": "https://github.com/iburning/ci-image",
+  "authors": [
+    "burning <iburning@live.cn>"
+  ],
+  "description": "CIImage demo",
+  "main": "",
+  "moduleType": [
+    "amd"
+  ],
+  "keywords": [
+    "image",
+    "canvas",
+    "exif"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "exif-js": "^2.1.1",
+    "jquery": "^3.1.1"
+  }
+}

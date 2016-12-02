@@ -4,12 +4,41 @@
  * @version: 2016-12-01
  */
 
-import CIImage from 'ci-image'
+import CIImageUploader from 'ci-image-uploader'
+CIImageUploader.isDebug = true
 
-var src = 'http://img12.360buyimg.com/cms/jfs/t4087/29/78270449/95294/2bf5e226/583b86e5N5886c370.jpg'
-var myImage = new CIImage(src, function (ciImage) {
-  console.log(typeof ciImage, ciImage)
-  let image = ciImage.image
-  console.log(image.width, image.height, image.fileSize)
+let uploadApi = 'http://test2016.jiheapp.com/v1/image/img_upd'
+
+const $file = document.getElementById('file')
+$file.addEventListener('change', function (evt) {
+  const files = evt.target.files
+  console.log('$file.change', files)
+
+  if (files[0]) {
+    CIImageUploader.compress(files[0], { targetType: 'Blob'}, function (err, blob) {
+      console.log('compress', err, typeof blob, blob instanceof Blob)
+      upload(blob)
+    })
+
+    // upload(files[0])
+
+    function upload(file) {
+      CIImageUploader.upload({
+        api: uploadApi,
+        file: file,
+        params: {
+          token: 'Zjuc4zggxNj7asDZ',
+          customer_id: '43841',
+          dir: 2
+        },
+        didUpload(res) {
+          console.log('didUpload', res)
+        },
+        onError(err) {
+          console.log('onError', err)
+        }
+      })
+    }
+  }
+
 })
-console.log(typeof myImage, myImage)
