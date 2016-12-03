@@ -42,13 +42,20 @@ define("CafeinitVue", [], function() { return /******/ (function(modules) { // w
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
+
+	var _stringify = __webpack_require__(1);
+
+	var _stringify2 = _interopRequireDefault(_stringify);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 	/**
 	 * @fileoverview CIImageUploader
 	 * @author: burning <www.cafeinit.com>
@@ -94,6 +101,7 @@ define("CafeinitVue", [], function() { return /******/ (function(modules) { // w
 	    var formData = this._createFormData(opt.fileName || this.fileName, opt.file, opt.params);
 	    var timeout = parseInt(opt.timeout) || this.timeout;
 
+	    alert('uploading...');
 	    request({
 	      type: 'POST',
 	      url: api,
@@ -109,6 +117,7 @@ define("CafeinitVue", [], function() { return /******/ (function(modules) { // w
 	        opt.didUpload && opt.didUpload(res);
 	      },
 	      error: function error(err) {
+	        alert((0, _stringify2.default)(err));
 	        opt.onError && opt.onError(err);
 	      }
 	    });
@@ -199,6 +208,8 @@ define("CafeinitVue", [], function() { return /******/ (function(modules) { // w
 	      img.width = opt.maxWidth;
 	      img.height = parseInt(opt.maxWidth / ratio);
 
+	      alert(img.width + ', ' + img.height);
+
 	      if (!EXIF) {
 	        callback('EXIF undefinde');
 	      }
@@ -278,10 +289,12 @@ define("CafeinitVue", [], function() { return /******/ (function(modules) { // w
 
 	        if (opt.targetType.toUpperCase() == 'DATA') {
 	          that._log('_compress', 'to DATA');
+	          alert('to Data');
 	          // canvas.toDataURL(type, encoderOptions);
 	          callback(null, canvas.toDataURL('image/jpeg')); // 默认大于0.9
 	        } else if (opt.targetType.toUpperCase() == 'BLOB') {
 	          that._log('_compress', 'to BLOB');
+	          alert('to Blob');
 	          // canvas.toBlob(callback, mimeType, qualityArgument);
 	          canvas.toBlob(function (blob) {
 	            callback(null, blob);
@@ -364,6 +377,29 @@ define("CafeinitVue", [], function() { return /******/ (function(modules) { // w
 	    }
 	  }
 	};
+
+/***/ },
+/* 1 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = { "default": __webpack_require__(2), __esModule: true };
+
+/***/ },
+/* 2 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var core  = __webpack_require__(3)
+	  , $JSON = core.JSON || (core.JSON = {stringify: JSON.stringify});
+	module.exports = function stringify(it){ // eslint-disable-line no-unused-vars
+	  return $JSON.stringify.apply($JSON, arguments);
+	};
+
+/***/ },
+/* 3 */
+/***/ function(module, exports) {
+
+	var core = module.exports = {version: '2.4.0'};
+	if(typeof __e == 'number')__e = core; // eslint-disable-line no-undef
 
 /***/ }
 /******/ ])});;

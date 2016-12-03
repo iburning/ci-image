@@ -47,6 +47,7 @@ export default {
     const formData = this._createFormData(opt.fileName || this.fileName, opt.file, opt.params)
     const timeout = parseInt(opt.timeout) || this.timeout
 
+    alert('uploading...')
     request({
       type: 'POST',
       url: api,
@@ -62,6 +63,7 @@ export default {
         opt.didUpload && opt.didUpload(res)
       },
       error(err) {
+        alert(JSON.stringify(err))
         opt.onError && opt.onError(err)
       }
     })
@@ -158,6 +160,8 @@ export default {
       img.width = opt.maxWidth
       img.height = parseInt(opt.maxWidth / ratio)
 
+      alert(img.width + ', ' + img.height)
+
       if (!EXIF) {
         callback('EXIF undefinde')
       }
@@ -229,11 +233,13 @@ export default {
 
           if (opt.targetType.toUpperCase() == 'DATA') {
             that._log('_compress', 'to DATA')
+            alert('to Data')
             // canvas.toDataURL(type, encoderOptions);
             callback(null, canvas.toDataURL('image/jpeg'))   // 默认大于0.9
           }
           else if (opt.targetType.toUpperCase() == 'BLOB') {
             that._log('_compress', 'to BLOB')
+            alert('to Blob')
             // canvas.toBlob(callback, mimeType, qualityArgument);
             canvas.toBlob(function (blob) {
               callback(null, blob)

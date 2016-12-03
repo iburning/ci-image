@@ -10,12 +10,14 @@ CIImageUploader.isDebug = true
 let uploadApi = 'http://test2016.jiheapp.com/v1/image/img_upd'
 
 const $file = document.getElementById('file')
+const $image = document.getElementById('image')
+
 $file.addEventListener('change', function (evt) {
   const files = evt.target.files
   console.log('$file.change', files)
 
   if (files[0]) {
-    CIImageUploader.compress(files[0], { targetType: 'Blob'}, function (err, blob) {
+    CIImageUploader.compress(files[0], { targetType: 'DATA'}, function (err, blob) {
       console.log('compress', err, typeof blob, blob instanceof Blob)
       upload(blob)
     })
@@ -33,9 +35,11 @@ $file.addEventListener('change', function (evt) {
         },
         didUpload(res) {
           console.log('didUpload', res)
+          $image.src = res.data.img
         },
         onError(err) {
           console.log('onError', err)
+          alert(JSON.stringify(err))
         }
       })
     }
