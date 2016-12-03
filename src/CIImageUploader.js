@@ -140,12 +140,16 @@ function _compress(imageData, opt, callback) {
 
     const ratio = img.width / img.height
     if (ratio >= 1) {
-      img.width = opt.maxSize
-      img.height = parseInt(opt.maxSize / ratio)
+      if (opt.width > opt.maxSize) {
+        img.width = opt.maxSize
+        img.height = parseInt(opt.maxSize / ratio)
+      }
     }
     else {
-      img.height = opt.maxSize
-      img.width = parseInt(opt.maxSize * ratio)
+      if (opt.height > opt.maxSize) {
+        img.height = opt.maxSize
+        img.width = parseInt(opt.maxSize * ratio)
+      }
     }
 
     if (isRevolve) {
@@ -260,8 +264,8 @@ function _getRevolveStep(img, callback) {
       radian = 90 * step * Math.PI / 180
     }
 
-    let info = [orientation, step, radian]
-    alert(info.join(' - '))
+    // let info = [orientation, step, radian]
+    // alert(info.join(' - '))
 
     callback(null, step, radian)
   })
