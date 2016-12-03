@@ -47,35 +47,83 @@ var CIImage =
 
 	'use strict';
 
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
 	/**
 	 * @fileoverview CIImage
 	 * @author: burning <www.cafeinit.com>
 	 * @version: 2016-12-01
 	 */
 
-	function CIImage(src, done) {
-	  console.log('CIImage.constructor', src, done);
-	  this.ver = '0.0.0';
-	  this.image = null;
+	// import EXIF from 'exif-js'
 
-	  if (typeof src == 'string') {
-	    this.initWithUrl(src, done);
+	exports.default = {
+	  var: '0.0.0',
+
+	  loadImage: function loadImage(src, callback) {
+	    var img = new Image();
+	    img.onload = function () {
+	      callback && callback.call(this, img);
+	    };
+	    img.src = src;
+	  },
+	  getData: function getData(img, callback) {
+	    EXIF.getData(img, callback);
+	  },
+	  _getData: function _getData(img, callback) {
+	    function handleBinaryFile(binFile) {
+	      var data = findEXIFinJPEG(binFile);
+	      var iptcdata = findIPTCinJPEG(binFile);
+	      img.exifdata = data || {};
+	      img.iptcdata = iptcdata || {};
+
+	      callback && callback.call(img);
+	    }
+
+	    if (img.src) {
+	      if (/^data\:/i.test(img.src)) {
+	        // Data URI
+	        console.log('CIImage._getData URI');
+	        // var arrayBuffer = base64ToArrayBuffer(img.src);
+	        // handleBinaryFile(arrayBuffer);
+	      } else if (/^blob\:/i.test(img.src)) {
+	        // Object URL
+	        console.log('CIImage._getData URL');
+	        // var fileReader = new FileReader();
+	        // fileReader.onload = function(e) {
+	        //   handleBinaryFile(e.target.result);
+	        // };
+	        // objectURLToBlob(img.src, function (blob) {
+	        //   fileReader.readAsArrayBuffer(blob);
+	        // });
+	      } else {
+	        (function () {
+	          console.log('CIImage._getData Request');
+	          var http = new XMLHttpRequest();
+	          http.onload = function () {
+	            if (this.status == 200 || this.status === 0) {
+	              handleBinaryFile(http.response);
+	            } else {
+	              throw 'Could not load image';
+	            }
+	            http = null;
+	          };
+	          http.open('GET', img.src, true);
+	          http.responseType = 'arraybuffer';
+	          http.send(null);
+	        })();
+	      }
+	    } else if (window.FileReader && (img instanceof window.Blob || img instanceof window.File)) {
+	      var fileReader = new FileReader();
+	      fileReader.onload = function (e) {
+	        if (debug) console.log("Got file of length " + e.target.result.byteLength);
+	        handleBinaryFile(e.target.result);
+	      };
+
+	      fileReader.readAsArrayBuffer(img);
+	    }
 	  }
-	}
-
-	module.exports = CIImage;
-
-	var prototype = CIImage.prototype;
-
-	prototype.initWithUrl = function (src, done) {
-	  console.log('CIImage.initWithUrl', src, done);
-	  var that = this;
-	  var image = new Image();
-	  image.onload = function () {
-	    that.image = image;
-	    done.call(that);
-	  };
-	  image.src = src;
 	};
 
 /***/ }

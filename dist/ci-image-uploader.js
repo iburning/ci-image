@@ -1,4 +1,5 @@
-define("CafeinitVue", [], function() { return /******/ (function(modules) { // webpackBootstrap
+var CIImage =
+/******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
 
@@ -387,4 +388,4 @@ define("CafeinitVue", [], function() { return /******/ (function(modules) { // w
 	if(typeof __e == 'number')__e = core; // eslint-disable-line no-undef
 
 /***/ }
-/******/ ])});;
+/******/ ]);

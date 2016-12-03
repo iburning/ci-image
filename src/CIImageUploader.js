@@ -83,7 +83,7 @@ export default {
   compress(img, opt, callback) {
     const that = this
     opt.quality = (parseInt(opt.quality) || 95) / 100
-    opt.maxWidth = parseInt(opt.maxWidth) || 1280
+    opt.maxSize = parseInt(opt.maxSize) || 1280
     opt.targetType = opt.targetType || 'DATA'   // 'Blog 暂时不支持'
 
     if (img && img instanceof File) {
@@ -113,18 +113,25 @@ export default {
 
     let img = new Image()
     img.onload = function () {
-      // if (img.width <= opt.maxWidth) {
-      //   that._log('_compress', "don't need compressing")
-      //   callback(null, imageData)
-      //   return
-      // }
+      if (img.width <= opt.maxSize && img.height <= opt.maxSize) {
+        that._log('_compress', "don't need compressing")
+        callback(null, imageData)
+        return
+      }
 
       const ratio = img.width / img.height
-      img.width = opt.maxWidth
-      img.height = parseInt(opt.maxWidth / ratio)
+      if (ratio >= 1) {
+        img.width = opt.maxSize
+        img.height = parseInt(opt.maxSize / ratio)
+      }
+      else {
+        img.height = opt.maxSize
+        img.width = parseInt(opt.maxSize * ratio)
+      }
+
 
       if (isRevolve) {
-        console.log('isRevolve', isRevolve)
+        console.log('_compress isRevolve', isRevolve)
         that._getRevolveStep(img, function (err, step, degree) {
           if (err) {
             callback(err)
@@ -188,95 +195,10 @@ export default {
           })
         }
 
+        img = null
         ctx = null
         canvas = null
       }
-
-      // if (!EXIF) {
-      //   callback('EXIF undefinde')
-      // }
-      //
-      // // try {
-      //   EXIF.getData(img, function () {
-      //     let step = 0     // 旋转步数
-      //     let degree = 0   // 旋转弧度
-      //     let exif = EXIF.pretty(this)
-      //     // that._log('exif', exif)
-      //
-      //     if (exif) {
-      //       // var make = EXIF.getTag(this, 'Make')
-      //       const orientation = EXIF.getTag(this, 'Orientation')
-      //       if (orientation) {
-      //         switch (orientation) {
-      //           case 6:       // 相机垂直
-      //             step = 1    // 图片为270度 需要旋转90度
-      //             break
-      //           case 3:       // 相机旋转90度
-      //             step = 2    // 图片为270度 需要旋转180度
-      //             break;
-      //           case 8:       // 相机旋转180度
-      //             step = 3    // 图片为270度 需要旋转180度
-      //             break;
-      //           case 1:       // 相机旋转270度
-      //             step = 0    // 图片为270度 需要旋转0度
-      //             break
-      //         }
-      //         degree = 90 * step * Math.PI / 180
-      //       }
-      //     }
-      //
-      //     let canvas = document.createElement('canvas')
-      //     let ctx = canvas.getContext('2d')
-      //     ctx.clearRect(0, 0, canvas.width, canvas.height)   // canvas清屏
-      //
-      //     switch (step) {
-      //       case 0:   // 不旋转
-      //         canvas.width = img.width
-      //         canvas.height = img.height
-      //         ctx.rotate(degree)
-      //         ctx.drawImage(img, 0, 0, img.width, img.height)
-      //         break
-      //
-      //       case 1:   // 旋转90度
-      //         canvas.width = img.height
-      //         canvas.height = img.width
-      //         ctx.rotate(degree)
-      //         ctx.drawImage(img, 0, -img.height, img.width, img.height)
-      //         break
-      //
-      //       case 2:   // 旋转180度
-      //         canvas.width = img.width
-      //         canvas.height = img.height
-      //         ctx.rotate(degree)
-      //         ctx.drawImage(img, -img.width, -img.height, img.width, img.height)
-      //         break
-      //
-      //       case 3:   // 旋转270度
-      //         canvas.width = img.height
-      //         canvas.height = img.width
-      //         ctx.rotate(degree)
-      //         ctx.drawImage(img, -img.width, 0, img.width, img.height)
-      //         break
-      //     }
-      //
-      //     if (opt.targetType.toUpperCase() == 'DATA') {
-      //       that._log('_compress', 'to DATA')
-      //       // https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toDataURL
-      //       // canvas.toDataURL(type, encoderOptions);
-      //       callback(null, canvas.toDataURL('image/jpeg'))   // 默认大于0.9
-      //     }
-      //     else if (opt.targetType.toUpperCase() == 'BLOB') {
-      //       that._log('_compress', 'to BLOB')
-      //       // https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob
-      //       // canvas.toBlob(callback, mimeType, qualityArgument);
-      //       canvas.toBlob(function (blob) {
-      //         callback(null, blob)
-      //       })
-      //     }
-      //
-      //     ctx = null
-      //     canvas = null
-      //   })
     }
 
     img.src = imageData
@@ -311,18 +233,19 @@ export default {
       const orientation = EXIF.getTag(this, 'Orientation')
       that._log('_getRevolveStep orientation', orientation)
 
+      // http://jpegclub.org/exif_orientation.html
       if (orientation) {
         switch (orientation) {
-          case 6:       // 相机垂直
+          case 5, 6:    // 手机垂直
             step = 1    // 图片为270度 需要旋转90度
             break
-          case 3:       // 相机旋转90度
+          case 3, 4:    // 手机旋转90度
             step = 2    // 图片为270度 需要旋转180度
             break;
-          case 8:       // 相机旋转180度
+          case 7, 8:    // 手机旋转180度
             step = 3    // 图片为270度 需要旋转180度
             break;
-          case 1:       // 相机旋转270度
+          case 1, 2:    // 手机旋转270度
             step = 0    // 图片为270度 需要旋转0度
             break
         }
@@ -333,22 +256,22 @@ export default {
     })
   },
 
-  // https://github.com/exif-js/exif-js/blob/master/exif.js#L319
-  _base64ToArrayBuffer(base64, contentType) {
-    contentType = contentType || base64.match(/^data\:([^\;]+)\;base64,/mi)[1] || ''; // e.g. 'data:image/jpeg;base64,...' => 'image/jpeg'
-    base64 = base64.replace(/^data\:([^\;]+)\;base64,/gmi, '');
-
-    var binary = atob(base64);
-    var len = binary.length;
-    var buffer = new ArrayBuffer(len);
-    var view = new Uint8Array(buffer);
-
-    for (var i = 0; i < len; i++) {
-      view[i] = binary.charCodeAt(i);
-    }
-
-    return buffer;
-  },
+  // // https://github.com/exif-js/exif-js/blob/master/exif.js#L319
+  // _base64ToArrayBuffer(base64, contentType) {
+  //   contentType = contentType || base64.match(/^data\:([^\;]+)\;base64,/mi)[1] || ''; // e.g. 'data:image/jpeg;base64,...' => 'image/jpeg'
+  //   base64 = base64.replace(/^data\:([^\;]+)\;base64,/gmi, '');
+  //
+  //   var binary = atob(base64);
+  //   var len = binary.length;
+  //   var buffer = new ArrayBuffer(len);
+  //   var view = new Uint8Array(buffer);
+  //
+  //   for (var i = 0; i < len; i++) {
+  //     view[i] = binary.charCodeAt(i);
+  //   }
+  //
+  //   return buffer;
+  // },
 
   // https://github.com/ebidel/filer.js/blob/master/src/filer.js#L137
   _dataURLtoBlob(dataURL) {
