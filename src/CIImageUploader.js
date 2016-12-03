@@ -4,7 +4,7 @@
  * @version: 2016-12-02
  */
 
-export default {
+module.exports = {
   var: '0.0.0',
   api: '',
   fileName: 'file',
