@@ -17,9 +17,12 @@ $file.addEventListener('change', function (evt) {
   console.log('$file.change', files)
 
   if (files[0]) {
-    CIImageUploader.compress(files[0], { targetType: 'DATA'}, function (err, blob) {
+    CIImageUploader.compress(files[0], {
+      quality: 90,
+      maxSize: 1280,
+    }, function (err, blob) {
       console.log('compress', err, typeof blob, blob instanceof Blob)
-      upload(blob)
+      // upload(blob)
     })
 
     // upload(files[0])
