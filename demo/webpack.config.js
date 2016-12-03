@@ -21,7 +21,6 @@ module.exports = {
     extensions: ['', '.js'],
     fallback: [path.join(__dirname, '../node_modules')],
     alias: {
-      'ci-image': path.resolve(__dirname, '../dist/ci-image.amd.js'),
       'ci-image-uploader': path.resolve(__dirname, '../dist/ci-image-uploader.amd.js')
     }
   },

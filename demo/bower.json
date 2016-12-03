@@ -1,10 +1,10 @@
 {
-  "name": "ci-image-demo",
-  "homepage": "https://github.com/iburning/ci-image",
+  "name": "ci-image-uploader",
+  "homepage": "https://github.com/iburning/ci-image-uploader",
   "authors": [
     "burning <iburning@live.cn>"
   ],
-  "description": "CIImage demo",
+  "description": "CIImageUploader Demo",
   "main": "",
   "moduleType": [
     "amd"
@@ -24,6 +24,6 @@
   ],
   "dependencies": {
     "exif-js": "^2.1.1",
-    "jquery": "^3.1.1"
+    "jquery": "^2.1.1"
   }
 }

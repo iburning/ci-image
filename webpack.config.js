@@ -6,7 +6,6 @@
 
 module.exports = {
   entry: {
-    // 'ci-image': './src/CIImage.js',
     'ci-image-uploader': './src/CIImageUploader.js'
   },
 
