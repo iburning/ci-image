@@ -140,13 +140,13 @@ function _compress(imageData, opt, callback) {
 
     const ratio = img.width / img.height
     if (ratio >= 1) {
-      if (opt.width > opt.maxSize) {
+      if (img.width > opt.maxSize) {
         img.width = opt.maxSize
         img.height = parseInt(opt.maxSize / ratio)
       }
     }
     else {
-      if (opt.height > opt.maxSize) {
+      if (img.height > opt.maxSize) {
         img.height = opt.maxSize
         img.width = parseInt(opt.maxSize * ratio)
       }
