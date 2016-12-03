@@ -6,7 +6,7 @@
   "scripts": {
     "build:lib": "webpack --config ./webpack.config.js",
     "build:amd": "webpack --config ./webpack.config.amd.js",
-    "demo": "webpack-dev-server --open --inline --config demo/webpack.config.js --content-base demo/ --host 192.168.0.107",
+    "demo": "webpack-dev-server --host $LOCALHOST --open --inline --config demo/webpack.config.js --content-base demo/",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

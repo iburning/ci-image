@@ -81,27 +81,22 @@ define("CafeinitVue", [], function() { return /******/ (function(modules) { // w
 	   * @param onError: Function(err)
 	   */
 	  upload: function upload(opt) {
-	    if (opt.file instanceof File) {
-	      this._log('upload', 'File');
-	      this._uploadFile(opt);
-	    } else if (opt.file instanceof Blob) {
-	      this._log('upload', 'Blob');
-	      this._uploadFile(opt);
-	    } else if (typeof opt.file == 'string') {
-	      this._log('upload', 'String');
-	      this._uploadString(opt);
-	    }
-	  },
-	  _request: function _request() {
-	    return window.$ ? $.ajax : null;
-	  },
-	  _uploadFile: function _uploadFile(opt) {
 	    var api = opt.api || this.api;
 	    var request = opt.request || this._request();
-	    var formData = this._createFormData(opt.fileName || this.fileName, opt.file, opt.params);
 	    var timeout = parseInt(opt.timeout) || this.timeout;
 
-	    alert('uploading...');
+	    var file = opt.file;
+
+	    if (typeof file == 'string') {
+	      file = this._dataURLtoBlob(opt.file);
+	      if (!file) {
+	        opt.onError && opt.onError('dataURL to Blob fail');
+	        return;
+	      }
+	    }
+
+	    var formData = this._createFormData(opt.fileName || this.fileName, file, opt.params);
+
 	    request({
 	      type: 'POST',
 	      url: api,
@@ -121,47 +116,88 @@ define("CafeinitVue", [], function() { return /******/ (function(modules) { // w
 	        opt.onError && opt.onError(err);
 	      }
 	    });
+
+	    // if (opt.file instanceof File) {
+	    //   this._log('upload', 'File')
+	    //   this._uploadFile(opt)
+	    // }
+	    // else if (opt.file instanceof Blob) {
+	    //   this._log('upload', 'Blob')
+	    //   this._uploadFile(opt)
+	    // }
+	    // else if (typeof opt.file == 'string') {
+	    //   this._log('upload', 'String')
+	    //   this._uploadString(opt)
+	    // }
 	  },
-	  _uploadString: function _uploadString(opt) {
-	    var that = this;
-	    var api = opt.api || this.api;
-	    var request = opt.request || this._request();
-	    var timeout = parseInt(opt.timeout) || this.timeout;
-
-	    var data = opt.file;
-	    var params = opt.params;
-
-	    this._dataURLtoBlob(data, function (err, blob) {
-	      if (err) {
-	        opt.onError && opt.onError(err);
-	        return;
-	      }
-
-	      var formData = that._createFormData(opt.fileName || that.fileName, blob, params);
-
-	      request({
-	        type: 'POST',
-	        url: api,
-	        dataType: 'text', // 决绝跨域POST问题
-	        data: formData,
-	        timeout: timeout,
-	        processData: false, // 不将 data 转换为字符串
-	        contentType: false, // 默认'application/x-www-form-urlencoded', 通过设置 false 跳过设置默认值
-	        success: function success(res) {
-	          if (typeof res === 'string') {
-	            res = JSON.parse(res);
-	          }
-	          opt.didUpload && opt.didUpload(res);
-	        },
-	        error: function error(err) {
-	          opt.onError && opt.onError(err);
-	        }
-	      });
-	    });
+	  _request: function _request() {
+	    return window.$ ? $.ajax : null;
 	  },
+
+
+	  // _uploadFile(opt) {
+	  //   const api = opt.api || this.api
+	  //   const request = opt.request || this._request()
+	  //   const timeout = parseInt(opt.timeout) || this.timeout
+	  //   const formData = this._createFormData(opt.fileName || this.fileName, opt.file, opt.params)
+	  //
+	  //   request({
+	  //     type: 'POST',
+	  //     url: api,
+	  //     dataType: 'text',     // 决绝跨域POST问题
+	  //     data: formData,
+	  //     timeout: timeout,
+	  //     processData: false,     // 不将 data 转换为字符串
+	  //     contentType: false,     // 默认'application/x-www-form-urlencoded', 通过设置 false 跳过设置默认值
+	  //     success(res) {
+	  //       if (typeof res === 'string') {
+	  //         res = JSON.parse(res)
+	  //       }
+	  //       opt.didUpload && opt.didUpload(res)
+	  //     },
+	  //     error(err) {
+	  //       alert(JSON.stringify(err))
+	  //       opt.onError && opt.onError(err)
+	  //     }
+	  //   })
+	  // },
+	  //
+	  // _uploadString(opt) {
+	  //   const api = opt.api || this.api
+	  //   const request = opt.request || this._request()
+	  //   const timeout = parseInt(opt.timeout) || this.timeout
+	  //
+	  //   const blob = this._dataURLtoBlob(opt.file)
+	  //   if (!blob) {
+	  //     opt.onError && opt.onError('dataURL to Blob fail')
+	  //     return
+	  //   }
+	  //
+	  //   const formData = this._createFormData(opt.fileName || that.fileName, blob, opt.params)
+	  //
+	  //   request({
+	  //     type: 'POST',
+	  //     url: api,
+	  //     dataType: 'text',       // 决绝跨域POST问题
+	  //     data: formData,
+	  //     timeout: timeout,
+	  //     processData: false,     // 不将 data 转换为字符串
+	  //     contentType: false,     // 默认'application/x-www-form-urlencoded', 通过设置 false 跳过设置默认值
+	  //     success(res) {
+	  //       if (typeof res === 'string') {
+	  //         res = JSON.parse(res)
+	  //       }
+	  //       opt.didUpload && opt.didUpload(res)
+	  //     },
+	  //     error(err) {
+	  //       opt.onError && opt.onError(err)
+	  //     }
+	  //   })
+	  // },
+
+
+	  // https://developer.mozilla.org/en-US/docs/Web/API/FormData/append
 	  _createFormData: function _createFormData(fileName, file, params) {
-	    // https://developer.mozilla.org/en-US/docs/Web/API/FormData/append
-
 	    if (fileName && file) {
 	      var formData = new FormData();
 	      formData.append(fileName, file);
@@ -177,8 +213,9 @@ define("CafeinitVue", [], function() { return /******/ (function(modules) { // w
 	  },
 	  compress: function compress(img, opt, callback) {
 	    var that = this;
+	    opt.quality = (parseInt(opt.quality) || 95) / 100;
 	    opt.maxWidth = parseInt(opt.maxWidth) || 1280;
-	    opt.targetType = opt.targetType || 'DATA';
+	    opt.targetType = opt.targetType || 'DATA'; // 'Blog 暂时不支持'
 
 	    if (img && img instanceof File) {
 	      this._readFile(img, function (err, data) {
@@ -207,8 +244,6 @@ define("CafeinitVue", [], function() { return /******/ (function(modules) { // w
 	      var ratio = img.width / img.height;
 	      img.width = opt.maxWidth;
 	      img.height = parseInt(opt.maxWidth / ratio);
-
-	      alert(img.width + ', ' + img.height);
 
 	      if (!EXIF) {
 	        callback('EXIF undefinde');
@@ -245,8 +280,6 @@ define("CafeinitVue", [], function() { return /******/ (function(modules) { // w
 	            }
 	            degree = 90 * step * Math.PI / 180;
 	          }
-
-	          // alert(orientation + ' - ' + step)
 	        }
 
 	        var canvas = document.createElement('canvas');
@@ -289,12 +322,12 @@ define("CafeinitVue", [], function() { return /******/ (function(modules) { // w
 
 	        if (opt.targetType.toUpperCase() == 'DATA') {
 	          that._log('_compress', 'to DATA');
-	          alert('to Data');
+	          // https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toDataURL
 	          // canvas.toDataURL(type, encoderOptions);
 	          callback(null, canvas.toDataURL('image/jpeg')); // 默认大于0.9
 	        } else if (opt.targetType.toUpperCase() == 'BLOB') {
 	          that._log('_compress', 'to BLOB');
-	          alert('to Blob');
+	          // https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob
 	          // canvas.toBlob(callback, mimeType, qualityArgument);
 	          canvas.toBlob(function (blob) {
 	            callback(null, blob);
@@ -304,19 +337,6 @@ define("CafeinitVue", [], function() { return /******/ (function(modules) { // w
 	        ctx = null;
 	        canvas = null;
 	      });
-	      // }
-	      // catch (err) {
-	      //   console.log('no exif')
-	      //   done(err, imageData)
-	      //   // alert('exif error: ' + err)
-	      //   // canvas.width = img.width
-	      //   // canvas.height = img.height
-	      //   // ctx.drawImage(img, 0, 0, img.width, img.height)
-	      //   //
-	      //   // if (typeof callback === 'function') {
-	      //   //   callback(canvas.toDataURL('image/jpeg'));   // 默认大于0.9
-	      //   // }
-	      // }
 	    };
 
 	    img.src = imageData;
@@ -333,43 +353,47 @@ define("CafeinitVue", [], function() { return /******/ (function(modules) { // w
 	  },
 
 
-	  // https://github.com/ebidel/filer.js/blob/master/src/filer.js#L137
-	  _dataURLtoBlob: function _dataURLtoBlob(dataURL, callback) {
-	    var BASE64_MARKER = ';base64,';
-	    var parts = void 0,
-	        contentType = void 0,
-	        raw = void 0;
+	  // https://github.com/exif-js/exif-js/blob/master/exif.js#L319
+	  _base64ToArrayBuffer: function _base64ToArrayBuffer(base64, contentType) {
+	    contentType = contentType || base64.match(/^data\:([^\;]+)\;base64,/mi)[1] || ''; // e.g. 'data:image/jpeg;base64,...' => 'image/jpeg'
+	    base64 = base64.replace(/^data\:([^\;]+)\;base64,/gmi, '');
 
-	    if (dataURL.indexOf(BASE64_MARKER) === -1) {
-	      parts = dataURL.split(',');
-	      contentType = parts[0].split(':')[1];
-	      raw = decodeURIComponent(parts[1]);
+	    var binary = atob(base64);
+	    var len = binary.length;
+	    var buffer = new ArrayBuffer(len);
+	    var view = new Uint8Array(buffer);
 
-	      try {
-	        callback(null, new Blob([raw], { type: contentType }));
-	      } catch (err) {
-	        callback(err);
-	      }
-
-	      return;
+	    for (var i = 0; i < len; i++) {
+	      view[i] = binary.charCodeAt(i);
 	    }
 
-	    parts = dataURL.split(BASE64_MARKER);
-	    contentType = parts[0].split(':')[1];
-	    raw = window.atob(parts[1]);
+	    return buffer;
+	  },
 
+
+	  // https://github.com/ebidel/filer.js/blob/master/src/filer.js#L137
+	  _dataURLtoBlob: function _dataURLtoBlob(dataURL) {
+	    var BASE64_MARKER = ';base64,';
+	    if (dataURL.indexOf(BASE64_MARKER) == -1) {
+	      var parts = dataURL.split(',');
+	      var contentType = parts[0].split(':')[1];
+	      var raw = decodeURIComponent(parts[1]);
+
+	      return new Blob([raw], { type: contentType });
+	    }
+
+	    var parts = dataURL.split(BASE64_MARKER);
+	    var contentType = parts[0].split(':')[1];
+	    var raw = window.atob(parts[1]);
 	    var rawLength = raw.length;
+
 	    var uInt8Array = new Uint8Array(rawLength);
 
-	    for (var i = 0; i < rawLength; i++) {
+	    for (var i = 0; i < rawLength; ++i) {
 	      uInt8Array[i] = raw.charCodeAt(i);
 	    }
 
-	    try {
-	      callback(null, new Blob([uInt8Array], { type: contentType }));
-	    } catch (err) {
-	      callback(err);
-	    }
+	    return new Blob([uInt8Array], { type: contentType });
 	  },
 	  _log: function _log(sender, info) {
 	    if (this.isDebug) {
