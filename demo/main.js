@@ -5,7 +5,8 @@
  */
 
 import CIImageUploader from 'ci-image-uploader'
-CIImageUploader.isDebug = true
+CIImageUploader.debug()
+window.CIImageUploader = CIImageUploader
 
 let uploadApi = 'http://test2016.jiheapp.com/v1/image/img_upd'
 
@@ -22,30 +23,32 @@ $file.addEventListener('change', function (evt) {
       maxSize: 1280,
     }, function (err, blob) {
       console.log('compress', err, typeof blob, blob instanceof Blob)
-      // upload(blob)
+      if (err) {
+        alert(JSON.stringify(err))
+      }
+      else {
+        upload(blob)
+      }
     })
-
     // upload(files[0])
-
-    function upload(file) {
-      CIImageUploader.upload({
-        api: uploadApi,
-        file: file,
-        params: {
-          token: 'Zjuc4zggxNj7asDZ',
-          customer_id: '43841',
-          dir: 2
-        },
-        didUpload(res) {
-          console.log('didUpload', res)
-          $image.src = res.data.img
-        },
-        onError(err) {
-          console.log('onError', err)
-          alert(JSON.stringify(err))
-        }
-      })
-    }
   }
-
 })
+
+function upload(file) {
+  CIImageUploader.upload(file, {
+    api: uploadApi,
+    params: {
+      token: 'Zjuc4zggxNj7asDZ',
+      customer_id: '43841',
+      dir: 2
+    }
+  }, function (err, res) {
+    console.log('upload', err, res)
+    if (err) {
+      alert(JSON.stringify(err))
+    }
+    else {
+      $image.src = res.data.img
+    }
+  })
+}

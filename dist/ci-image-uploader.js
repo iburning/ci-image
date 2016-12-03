@@ -43,20 +43,13 @@ var CIImage =
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
 	  value: true
 	});
-
-	var _stringify = __webpack_require__(1);
-
-	var _stringify2 = _interopRequireDefault(_stringify);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 	/**
 	 * @fileoverview CIImageUploader
 	 * @author: burning <www.cafeinit.com>
@@ -68,7 +61,11 @@ var CIImage =
 	  api: '',
 	  fileName: 'file',
 	  timeout: 10000,
-	  isDebug: false,
+
+	  debug: function debug() {
+	    _isDebug = true;
+	  },
+
 
 	  /**
 	   * @param file: Object        require
@@ -76,27 +73,25 @@ var CIImage =
 	   * @param params: Object      default = {}
 	   * @param api: String         default = this.api
 	   * @param timeout:Number      default = 10000
-	   * @param request: Object     default = this._request()
-	   * @param onUploading: Function
-	   * @param didUpload: Function(res)
-	   * @param onError: Function(err)
+	   * @param request: Object     default = _request()
+	  //  * @param onUploading: Function
+	  //  * @param didUpload: Function(res)
+	  //  * @param onError: Function(err)
 	   */
-	  upload: function upload(opt) {
+	  upload: function upload(file, opt, callback) {
 	    var api = opt.api || this.api;
-	    var request = opt.request || this._request();
+	    var request = opt.request || _request();
 	    var timeout = parseInt(opt.timeout) || this.timeout;
 
-	    var file = opt.file;
-
 	    if (typeof file == 'string') {
-	      file = this._dataURLtoBlob(opt.file);
+	      file = _dataURLtoBlob(file);
 	      if (!file) {
-	        opt.onError && opt.onError('dataURL to Blob fail');
+	        callback('dataURL to Blob fail');
 	        return;
 	      }
 	    }
 
-	    var formData = this._createFormData(opt.fileName || this.fileName, file, opt.params);
+	    var formData = _createFormData(opt.fileName || this.fileName, file, opt.params);
 
 	    request({
 	      type: 'POST',
@@ -110,33 +105,12 @@ var CIImage =
 	        if (typeof res === 'string') {
 	          res = JSON.parse(res);
 	        }
-	        opt.didUpload && opt.didUpload(res);
+	        callback(null, res);
 	      },
 	      error: function error(err) {
-	        alert((0, _stringify2.default)(err));
-	        opt.onError && opt.onError(err);
+	        callback(err);
 	      }
 	    });
-	  },
-	  _request: function _request() {
-	    return window.$ ? $.ajax : null;
-	  },
-
-
-	  // https://developer.mozilla.org/en-US/docs/Web/API/FormData/append
-	  _createFormData: function _createFormData(fileName, file, params) {
-	    if (fileName && file) {
-	      var formData = new FormData();
-	      formData.append(fileName, file);
-	      if (params) {
-	        for (var key in params) {
-	          formData.append(key, params[key]);
-	        }
-	      }
-	      return formData;
-	    } else {
-	      return null;
-	    }
 	  },
 	  compress: function compress(img, opt, callback) {
 	    var that = this;
@@ -145,247 +119,251 @@ var CIImage =
 	    opt.targetType = opt.targetType || 'DATA'; // 'Blog 暂时不支持'
 
 	    if (img && img instanceof File) {
-	      this._readFile(img, function (err, data) {
+	      _readFile(img, function (err, data) {
 	        if (err) {
 	          callback(err);
 	        } else {
-	          that._compress(data, opt, callback);
+	          _compress(data, opt, callback);
 	        }
 	      });
 	    } else {
-	      that._compress(img, opt, callback);
-	    }
-	  },
-	  _compress: function _compress(imageData, opt, callback) {
-	    // this._log('_compress', opt)
-	    var that = this;
-
-	    var isRevolve = true;
-	    if (typeof opt.isRevolve == 'boolean') {
-	      isRevolve = opt.isRevolve;
-	    }
-
-	    var img = new Image();
-	    img.onload = function () {
-	      if (img.width <= opt.maxSize && img.height <= opt.maxSize) {
-	        that._log('_compress', "don't need compressing");
-	        callback(null, imageData);
-	        return;
-	      }
-
-	      var ratio = img.width / img.height;
-	      if (ratio >= 1) {
-	        img.width = opt.maxSize;
-	        img.height = parseInt(opt.maxSize / ratio);
-	      } else {
-	        img.height = opt.maxSize;
-	        img.width = parseInt(opt.maxSize * ratio);
-	      }
-
-	      if (isRevolve) {
-	        console.log('_compress isRevolve', isRevolve);
-	        that._getRevolveStep(img, function (err, step, degree) {
-	          if (err) {
-	            callback(err);
-	            return;
-	          }
-
-	          _redraw(img, step, degree);
-	        });
-	        return;
-	      }
-
-	      _redraw(img, 0, 0);
-
-	      function _redraw(img, step, degree) {
-	        var canvas = document.createElement('canvas');
-	        var ctx = canvas.getContext('2d');
-	        ctx.clearRect(0, 0, canvas.width, canvas.height); // canvas清屏
-
-	        switch (step) {
-	          case 0:
-	            // 不旋转
-	            canvas.width = img.width;
-	            canvas.height = img.height;
-	            ctx.rotate(degree);
-	            ctx.drawImage(img, 0, 0, img.width, img.height);
-	            break;
-
-	          case 1:
-	            // 旋转90度
-	            canvas.width = img.height;
-	            canvas.height = img.width;
-	            ctx.rotate(degree);
-	            ctx.drawImage(img, 0, -img.height, img.width, img.height);
-	            break;
-
-	          case 2:
-	            // 旋转180度
-	            canvas.width = img.width;
-	            canvas.height = img.height;
-	            ctx.rotate(degree);
-	            ctx.drawImage(img, -img.width, -img.height, img.width, img.height);
-	            break;
-
-	          case 3:
-	            // 旋转270度
-	            canvas.width = img.height;
-	            canvas.height = img.width;
-	            ctx.rotate(degree);
-	            ctx.drawImage(img, -img.width, 0, img.width, img.height);
-	            break;
-	        }
-
-	        if (opt.targetType.toUpperCase() == 'DATA') {
-	          that._log('_compress', 'to DATA');
-	          // https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toDataURL
-	          // canvas.toDataURL(type, encoderOptions);
-	          callback(null, canvas.toDataURL('image/jpeg')); // 默认大于0.9
-	        } else if (opt.targetType.toUpperCase() == 'BLOB') {
-	          that._log('_compress', 'to BLOB');
-	          // https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob
-	          // canvas.toBlob(callback, mimeType, qualityArgument);
-	          canvas.toBlob(function (blob) {
-	            callback(null, blob);
-	          });
-	        }
-
-	        img = null;
-	        ctx = null;
-	        canvas = null;
-	      }
-	    };
-
-	    img.src = imageData;
-	  },
-	  _readFile: function _readFile(file, callback) {
-	    // https://developer.mozilla.org/en-US/docs/Web/API/FileReader/readAsDataURL
-	    var that = this;
-	    var reader = new FileReader();
-	    reader.onload = function (evt) {
-	      that._log('CIImageUploader.readFile', evt);
-	      callback(null, evt.target.result);
-	    };
-	    reader.readAsDataURL(file);
-	  },
-
-
-	  // 根据EXIF获取纠正旋转角度
-	  _getRevolveStep: function _getRevolveStep(img, callback) {
-	    var that = this;
-
-	    if (!EXIF) {
-	      callback('EXIF is undefined');
-	      return;
-	    }
-
-	    EXIF.getData(img, function () {
-	      var step = 0; // 旋转步数
-	      var degree = 0; // 旋转弧度
-	      var exif = EXIF.pretty(this);
-	      that._log('exif', exif);
-
-	      var orientation = EXIF.getTag(this, 'Orientation');
-	      that._log('_getRevolveStep orientation', orientation);
-
-	      // http://jpegclub.org/exif_orientation.html
-	      if (orientation) {
-	        switch (orientation) {
-	          case (5, 6):
-	            // 手机垂直
-	            step = 1; // 图片为270度 需要旋转90度
-	            break;
-	          case (3, 4):
-	            // 手机旋转90度
-	            step = 2; // 图片为270度 需要旋转180度
-	            break;
-	          case (7, 8):
-	            // 手机旋转180度
-	            step = 3; // 图片为270度 需要旋转180度
-	            break;
-	          case (1, 2):
-	            // 手机旋转270度
-	            step = 0; // 图片为270度 需要旋转0度
-	            break;
-	        }
-	        degree = 90 * step * Math.PI / 180;
-	      }
-
-	      callback(null, step, degree);
-	    });
-	  },
-
-
-	  // // https://github.com/exif-js/exif-js/blob/master/exif.js#L319
-	  // _base64ToArrayBuffer(base64, contentType) {
-	  //   contentType = contentType || base64.match(/^data\:([^\;]+)\;base64,/mi)[1] || ''; // e.g. 'data:image/jpeg;base64,...' => 'image/jpeg'
-	  //   base64 = base64.replace(/^data\:([^\;]+)\;base64,/gmi, '');
-	  //
-	  //   var binary = atob(base64);
-	  //   var len = binary.length;
-	  //   var buffer = new ArrayBuffer(len);
-	  //   var view = new Uint8Array(buffer);
-	  //
-	  //   for (var i = 0; i < len; i++) {
-	  //     view[i] = binary.charCodeAt(i);
-	  //   }
-	  //
-	  //   return buffer;
-	  // },
-
-	  // https://github.com/ebidel/filer.js/blob/master/src/filer.js#L137
-	  _dataURLtoBlob: function _dataURLtoBlob(dataURL) {
-	    var BASE64_MARKER = ';base64,';
-	    if (dataURL.indexOf(BASE64_MARKER) == -1) {
-	      var parts = dataURL.split(',');
-	      var contentType = parts[0].split(':')[1];
-	      var raw = decodeURIComponent(parts[1]);
-
-	      return new Blob([raw], { type: contentType });
-	    }
-
-	    var parts = dataURL.split(BASE64_MARKER);
-	    var contentType = parts[0].split(':')[1];
-	    var raw = window.atob(parts[1]);
-	    var rawLength = raw.length;
-
-	    var uInt8Array = new Uint8Array(rawLength);
-
-	    for (var i = 0; i < rawLength; ++i) {
-	      uInt8Array[i] = raw.charCodeAt(i);
-	    }
-
-	    return new Blob([uInt8Array], { type: contentType });
-	  },
-	  _log: function _log(sender, info) {
-	    if (this.isDebug) {
-	      console.log('CIImageUploader', sender, info);
+	      _compress(img, opt, callback);
 	    }
 	  }
 	};
 
-/***/ },
-/* 1 */
-/***/ function(module, exports, __webpack_require__) {
+	// private properties and methods
+	// ===============================
 
-	module.exports = { "default": __webpack_require__(2), __esModule: true };
+	var _isDebug = false;
 
-/***/ },
-/* 2 */
-/***/ function(module, exports, __webpack_require__) {
+	function _log(sender, info) {
+	  if (_isDebug) {
+	    console.log('CIImageUploader', sender, info);
+	  }
+	}
 
-	var core  = __webpack_require__(3)
-	  , $JSON = core.JSON || (core.JSON = {stringify: JSON.stringify});
-	module.exports = function stringify(it){ // eslint-disable-line no-unused-vars
-	  return $JSON.stringify.apply($JSON, arguments);
-	};
+	function _request() {
+	  return window.$ ? $.ajax : null;
+	}
 
-/***/ },
-/* 3 */
-/***/ function(module, exports) {
+	function _readFile(file, callback) {
+	  // https://developer.mozilla.org/en-US/docs/Web/API/FileReader/readAsDataURL
+	  var reader = new FileReader();
+	  reader.onload = function (evt) {
+	    _log('CIImageUploader.readFile', evt);
+	    callback(null, evt.target.result);
+	  };
+	  reader.readAsDataURL(file);
+	}
 
-	var core = module.exports = {version: '2.4.0'};
-	if(typeof __e == 'number')__e = core; // eslint-disable-line no-undef
+	// https://developer.mozilla.org/en-US/docs/Web/API/FormData/append
+	function _createFormData(fileName, file, params) {
+	  if (fileName && file) {
+	    var formData = new FormData();
+	    formData.append(fileName, file);
+	    if (params) {
+	      for (var key in params) {
+	        formData.append(key, params[key]);
+	      }
+	    }
+	    return formData;
+	  } else {
+	    return null;
+	  }
+	}
+
+	function _compress(imageData, opt, callback) {
+	  // _log('_compress', opt)
+	  var isRevolve = true;
+	  if (typeof opt.isRevolve == 'boolean') {
+	    isRevolve = opt.isRevolve;
+	  }
+
+	  var img = new Image();
+	  img.onload = function () {
+	    if (img.width <= opt.maxSize && img.height <= opt.maxSize) {
+	      _log('_compress', "don't need compressing");
+	      callback(null, imageData);
+	      return;
+	    }
+
+	    var ratio = img.width / img.height;
+	    if (ratio >= 1) {
+	      img.width = opt.maxSize;
+	      img.height = parseInt(opt.maxSize / ratio);
+	    } else {
+	      img.height = opt.maxSize;
+	      img.width = parseInt(opt.maxSize * ratio);
+	    }
+
+	    if (isRevolve) {
+	      console.log('_compress isRevolve', isRevolve);
+	      _getRevolveStep(img, function (err, step, radian) {
+	        if (err) {
+	          callback(err);
+	          return;
+	        }
+	        redraw(img, step, radian);
+	      });
+	      return;
+	    }
+
+	    redraw(img, 0, 0);
+
+	    function redraw(img, step, radian) {
+	      var canvas = document.createElement('canvas');
+	      var ctx = canvas.getContext('2d');
+	      ctx.clearRect(0, 0, canvas.width, canvas.height); // canvas清屏
+
+	      switch (step) {
+	        case 0:
+	          // 不旋转
+	          canvas.width = img.width;
+	          canvas.height = img.height;
+	          ctx.rotate(radian);
+	          ctx.drawImage(img, 0, 0, img.width, img.height);
+	          break;
+
+	        case 1:
+	          // 旋转90度
+	          canvas.width = img.height;
+	          canvas.height = img.width;
+	          ctx.rotate(radian);
+	          ctx.drawImage(img, 0, -img.height, img.width, img.height);
+	          break;
+
+	        case 2:
+	          // 旋转180度
+	          canvas.width = img.width;
+	          canvas.height = img.height;
+	          ctx.rotate(radian);
+	          ctx.drawImage(img, -img.width, -img.height, img.width, img.height);
+	          break;
+
+	        case 3:
+	          // 旋转270度
+	          canvas.width = img.height;
+	          canvas.height = img.width;
+	          ctx.rotate(radian);
+	          ctx.drawImage(img, -img.width, 0, img.width, img.height);
+	          break;
+	      }
+
+	      if (opt.targetType.toUpperCase() == 'DATA') {
+	        _log('_compress', 'to DATA');
+	        // https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toDataURL
+	        // canvas.toDataURL(type, encoderOptions);
+	        callback(null, canvas.toDataURL('image/jpeg')); // 默认大于0.9
+	      } else if (opt.targetType.toUpperCase() == 'BLOB') {
+	        _log('_compress', 'to BLOB');
+	        // https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob
+	        // canvas.toBlob(callback, mimeType, qualityArgument);
+	        canvas.toBlob(function (blob) {
+	          callback(null, blob);
+	        });
+	      }
+
+	      img = null;
+	      ctx = null;
+	      canvas = null;
+	    }
+	  };
+
+	  img.src = imageData;
+	}
+
+	// 根据EXIF获取纠正旋转角度
+	function _getRevolveStep(img, callback) {
+	  if (!EXIF) {
+	    callback('EXIF is undefined');
+	    return;
+	  }
+
+	  EXIF.getData(img, function () {
+	    var step = 0; // 旋转步数
+	    var radian = 0; // 旋转弧度
+	    var exif = EXIF.pretty(this);
+	    _log('exif', exif);
+
+	    var orientation = EXIF.getTag(this, 'Orientation');
+	    _log('_getRevolveStep orientation', orientation);
+
+	    // http://jpegclub.org/exif_orientation.html
+	    if (orientation) {
+	      switch (orientation) {
+	        case 5:
+	        case 6:
+	          // 手机垂直
+	          step = 1; // 图片为270度 需要旋转90度
+	          break;
+	        case 3:
+	        case 4:
+	          // 手机旋转90度
+	          step = 2; // 图片为270度 需要旋转180度
+	          break;
+	        case 7:
+	        case 8:
+	          // 手机旋转180度
+	          step = 3; // 图片为270度 需要旋转180度
+	          break;
+	        case 1:
+	        case 2:
+	          // 手机旋转270度
+	          step = 0; // 图片为270度 需要旋转0度
+	          break;
+	      }
+	      radian = 90 * step * Math.PI / 180;
+	    }
+
+	    var info = [orientation, step, radian];
+	    alert(info.join(' - '));
+
+	    callback(null, step, radian);
+	  });
+	}
+
+	// // https://github.com/exif-js/exif-js/blob/master/exif.js#L319
+	// function _base64ToArrayBuffer(base64, contentType) {
+	//   contentType = contentType || base64.match(/^data\:([^\;]+)\;base64,/mi)[1] || ''; // e.g. 'data:image/jpeg;base64,...' => 'image/jpeg'
+	//   base64 = base64.replace(/^data\:([^\;]+)\;base64,/gmi, '');
+	//
+	//   var binary = atob(base64);
+	//   var len = binary.length;
+	//   var buffer = new ArrayBuffer(len);
+	//   var view = new Uint8Array(buffer);
+	//
+	//   for (var i = 0; i < len; i++) {
+	//     view[i] = binary.charCodeAt(i);
+	//   }
+	//
+	//   return buffer;
+	// }
+
+	// https://github.com/ebidel/filer.js/blob/master/src/filer.js#L137
+	function _dataURLtoBlob(dataURL) {
+	  var BASE64_MARKER = ';base64,';
+	  if (dataURL.indexOf(BASE64_MARKER) == -1) {
+	    var parts = dataURL.split(',');
+	    var contentType = parts[0].split(':')[1];
+	    var raw = decodeURIComponent(parts[1]);
+
+	    return new Blob([raw], { type: contentType });
+	  }
+
+	  var parts = dataURL.split(BASE64_MARKER);
+	  var contentType = parts[0].split(':')[1];
+	  var raw = window.atob(parts[1]);
+	  var rawLength = raw.length;
+
+	  var uInt8Array = new Uint8Array(rawLength);
+
+	  for (var i = 0; i < rawLength; ++i) {
+	    uInt8Array[i] = raw.charCodeAt(i);
+	  }
+
+	  return new Blob([uInt8Array], { type: contentType });
+	}
 
 /***/ }
 /******/ ]);
