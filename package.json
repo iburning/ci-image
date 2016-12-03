@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "build": "npm run build:lib && npm run build:amd",
-    "build:lib": "webpack --config ./webpack.config.js",
-    "build:amd": "webpack --config ./webpack.config.amd.js",
+    "build:lib": "webpack -p --config ./webpack.config.js",
+    "build:amd": "webpack -p --config ./webpack.config.amd.js",
     "demo": "webpack-dev-server --host $LOCALHOST --open --inline --config demo/webpack.config.js --content-base demo/",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

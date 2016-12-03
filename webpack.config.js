@@ -6,14 +6,14 @@
 
 module.exports = {
   entry: {
-    'ci-image': './src/CIImage.js',
+    // 'ci-image': './src/CIImage.js',
     'ci-image-uploader': './src/CIImageUploader.js'
   },
 
   output: {
     path: './dist',
     filename: '[name].js',
-    library: 'CIImage',
+    library: 'CIImageUploader',
     libraryTarget: 'var'  // Export by setting a variable: var Library = xxx (default)
   },
 
